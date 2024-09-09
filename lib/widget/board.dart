@@ -1,14 +1,15 @@
-import 'package:flutter/material.dart';
 import 'dart:ui' as ui;
+
+import 'package:flutter/material.dart';
 import 'package:magic_canvas/shape/shape.dart';
+
 import '../painter/board_painter.dart';
 import '../utils/utils.dart';
 
 typedef RemoveShapeCallback = Function(AbstractShape shape);
 typedef SelectShapeCallback = Function(AbstractShape? shape);
 typedef MouseLocationCallback = Function(Offset location);
-typedef MouseDownCallback = Function(
-    Offset location, VoidCallback defaultHandle);
+typedef MouseDownCallback = Function(Offset location, VoidCallback defaultHandle);
 typedef MouseUpCompleteCallback = Function();
 typedef MouseDownCompleteCallback = Function(Offset location);
 
@@ -25,12 +26,14 @@ class Board extends StatefulWidget {
     this.onMouseUpComplete,
     this.onMouseDownComplete,
     this.onShapeSelected,
+    this.isHandingShape = false,
   });
 
   final Size? size;
   final Color? color;
   final List<AbstractShape>? children;
   final bool isHanding;
+  final bool isHandingShape;
   final RemoveShapeCallback? onRemoveShape;
   final MouseLocationCallback? onMouseLocationChange;
   final MouseDownCallback? mouseDownHandle;
@@ -64,14 +67,12 @@ class BoardState extends State<Board> {
     );
     return Listener(
       onPointerHover: (event) {
-        Offset localPosition =
-            _transformationController.toScene(event.localPosition);
+        Offset localPosition = _transformationController.toScene(event.localPosition);
 
         widget.onMouseLocationChange?.call(localPosition);
         if (!widget.isHanding) {
           widget.children?.forEach((element) {
-            if (element.isOverObject(localPosition.rotate(
-                angle: -element.angle, center: element.center))) {
+            if (element.isOverObject(localPosition.rotate(angle: -element.angle, center: element.center))) {
               setState(() {
                 element.highlight();
               });
@@ -83,13 +84,10 @@ class BoardState extends State<Board> {
           });
         }
       },
-      onPointerDown: widget.isHanding
-          ? null
-          : (details) {
-              Offset localPosition =
-                  _transformationController.toScene(details.localPosition);
-              handleMouseDown(localPosition);
-            },
+      onPointerDown: (details) {
+        Offset localPosition = _transformationController.toScene(details.localPosition);
+        handleMouseDown(localPosition);
+      },
       child: InteractiveViewer(
         scaleEnabled: true,
         transformationController: _transformationController,
@@ -105,11 +103,11 @@ class BoardState extends State<Board> {
                       Offset localPosition = details.localPosition;
 
                       TextBoxShape? textBox = widget.children
-                          ?.where((element) => element.isSelected)
-                          .toList()
-                          .lastWhereNullable((element) =>
-                              element.isOverObject(localPosition) &&
-                              element is TextBoxShape) as TextBoxShape?;
+                              ?.where((element) => element.isSelected)
+                              .toList()
+                              .lastWhereNullable(
+                                  (element) => element.isOverObject(localPosition) && element is TextBoxShape)
+                          as TextBoxShape?;
                       if (textBox != null) {
                         textBox.startEdit();
                         _textEditingController.text = textBox.text;
@@ -157,8 +155,7 @@ class BoardState extends State<Board> {
                           textAlignVertical: TextAlignVertical.center,
                           onChanged: (value) {
                             setState(() {
-                              _editingTextBox?.text =
-                                  _textEditingController.text;
+                              _editingTextBox?.text = _textEditingController.text;
                             });
                           },
                           onSubmitted: (value) {
@@ -192,13 +189,10 @@ class BoardState extends State<Board> {
   Future<ui.Image> get rendered {
     var pictureRecorder = ui.PictureRecorder();
     Canvas canvas = Canvas(pictureRecorder);
-    BoardPainter painter =
-        BoardPainter(children: widget.children, background: widget.color);
+    BoardPainter painter = BoardPainter(children: widget.children, background: widget.color);
     var size = context.size;
     painter.paint(canvas, size!);
-    return pictureRecorder
-        .endRecording()
-        .toImage(size.width.floor(), size.height.floor());
+    return pictureRecorder.endRecording().toImage(size.width.floor(), size.height.floor());
   }
 
   void handleMouseDown(Offset localPosition) {
@@ -263,6 +257,8 @@ class BoardState extends State<Board> {
     );
 
     if (element != null) {
+      widget.onShapeSelected?.call(element);
+      if (widget.isHanding) return;
       if (!element.isSelected) {
         widget.children?.forEach((element) {
           element.deSelected();
@@ -285,11 +281,13 @@ class BoardState extends State<Board> {
       );
 
       if (element.isOverResizePoint(mouseRotated)) {
+        if (!widget.isHandingShape) return;
         setState(() {
           element.selected();
           element.startResize(element.overResizePoint(mouseRotated)!);
         });
       } else if (element.isOverRotatePoint(mouseRotated)) {
+        if (!widget.isHandingShape) return;
         setState(() {
           element.selected();
           element.startRotate(element.overRotatePoint(mouseRotated)!);
@@ -297,6 +295,7 @@ class BoardState extends State<Board> {
       } else if (element.isOverRemovePoint(mouseRotated)) {
         widget.onRemoveShape?.call(element);
       } else if (element.isOverObject(mouseRotated)) {
+        if (!widget.isHandingShape) return;
         setState(() {
           element.selected();
           element.startDrag();
