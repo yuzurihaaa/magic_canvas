@@ -1,6 +1,7 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:magic_canvas/utils/extension.dart';
+import 'package:ulid/ulid.dart';
 
 typedef ResizeCallback = Function(Offset oldMouse, Offset newMouse);
 
@@ -25,6 +26,7 @@ class ResizePoint {
 }
 
 abstract class AbstractShape {
+  final String id;
   Offset location;
   Size size;
   Color color;
@@ -44,12 +46,13 @@ abstract class AbstractShape {
   RotatePoint? _activeRotatePoint;
 
   AbstractShape({
+    String? id,
     this.location = const Offset(0, 0),
     this.size = const Size(20, 20),
     this.color = Colors.grey,
     this.zIndex = 0,
     this.reactSize = 10,
-  });
+  }) : id = id ?? Ulid().toCanonical();
 
   void draw(Canvas canvas, Size boardSize);
 
