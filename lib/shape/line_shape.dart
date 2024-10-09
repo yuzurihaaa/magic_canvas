@@ -14,13 +14,14 @@ class LineShape extends AbstractShape {
     super.id,
     double length = 150,
     double width = 4,
+    Offset? endOffset,
     super.location,
     super.color,
     super.zIndex,
     this.style = PaintingStyle.stroke,
     super.reactSize,
   }) {
-    _endOffset = location.translate(length, 0);
+    _endOffset = endOffset ?? location.translate(length, 0);
     super.size = Size(length, width);
   }
 
