@@ -12,6 +12,7 @@ class RectangleShape extends AbstractShape {
   Radius borderRadius;
 
   RectangleShape({
+    super.id,
     this.borderColor,
     this.borderRadius = Radius.zero,
     super.location,

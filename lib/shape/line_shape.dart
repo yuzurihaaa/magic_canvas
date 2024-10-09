@@ -6,11 +6,12 @@
 /// This code is written in the Dart programming language.
 
 import 'package:flutter/material.dart';
-import 'package:magic_canvas/utils/extension.dart';
 import 'package:magic_canvas/shape/shape.dart';
+import 'package:magic_canvas/utils/extension.dart';
 
 class LineShape extends AbstractShape {
   LineShape({
+    super.id,
     double length = 150,
     double width = 4,
     super.location,
