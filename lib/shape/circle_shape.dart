@@ -13,6 +13,7 @@ import 'package:magic_canvas/utils/extension.dart';
 
 class CircleShape extends TextBoxShape {
   CircleShape({
+    super.id,
     super.location,
     super.size,
     super.color,

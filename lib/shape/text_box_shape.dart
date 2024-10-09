@@ -12,6 +12,7 @@ class TextBoxShape extends RectangleShape {
   bool _isEditing = false;
 
   TextBoxShape({
+    super.id,
     this.text = '',
     this.textAlign = TextAlign.center,
     this.textStyle = const TextStyle(

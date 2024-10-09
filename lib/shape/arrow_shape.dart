@@ -13,6 +13,7 @@ import 'package:magic_canvas/shape/shape.dart';
 
 class ArrowShape extends LineShape {
   ArrowShape({
+    super.id,
     super.location,
     super.length = 150,
     super.width = 4,

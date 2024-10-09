@@ -12,6 +12,7 @@ import 'package:magic_canvas/shape/shape.dart';
 class ChatBubbleShape extends TextBoxShape {
   ChatBubbleShape({
     Offset? arrowPoint,
+    super.id,
     super.location,
     super.size,
     super.color,

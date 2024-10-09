@@ -13,6 +13,7 @@ class ImageShape extends TextBoxShape {
   Image image;
 
   ImageShape({
+    super.id,
     required this.image,
     super.borderColor,
     super.color,
